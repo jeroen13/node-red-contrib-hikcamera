@@ -1,0 +1,25 @@
+{
+    "name": "node-red-contrib-hikcamera",
+    "version": "1.0.0",
+    "description": "Hikvision Camera functions for Node Red",
+    "node-red": {
+        "nodes": {
+            "hikcamera": "hikcamera.js"
+        }
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [
+        "hikvision",
+        "camera",
+        "node-red"
+    ],
+    "author": "Dave Bowerman",
+    "license": "MIT",
+    "dependencies": {
+        "npm": "^5.7.1",
+        "request": "^2.88.0",
+        "xml2js": "^0.4.19"
+    }
+}
