@@ -4,7 +4,7 @@ Node-Red plugin to communicate with Hikvision IP surveillance cameras.
 
 This plugin is based on the great work of Henry Spanka, but stripped down to handle recieving camera events and grabbing images only.
 
-[![NPM](https://nodei.co/npm/node-red-contrib-hikvision.png?compact=true)](https://npmjs.org/package/node-red-contrib-hikcamera)
+[![NPM](https://nodei.co/npm/node-red-contrib-hikcamera.png?compact=true)](https://npmjs.org/package/node-red-contrib-hikcamera)
 
 # Help
 If you have any questions or help please open an issue on the GitHub project page.
