@@ -15,6 +15,10 @@
         "camera",
         "node-red"
     ],
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/dbowerman/node-red-contrib-hikcamera.git"
+    },
     "author": "Dave Bowerman",
     "license": "MIT",
     "dependencies": {
