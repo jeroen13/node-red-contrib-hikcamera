@@ -62,12 +62,14 @@ hikvisionApi.prototype.connect = function (options) {
 }
 
 function handleData(self, data) {
+	
+	var parseData = '';
 
 	let n = data.indexOf('<EventNotificationAlert');
 	if (n > -1) {
-		let parseData = data.slice(0, n);
+		parseData = data.slice(0, n);
 	} else {
-		let parseData = data;
+		parseData = data;
 	}
 
 	parser.parseString(parseData, (err, result) => {
