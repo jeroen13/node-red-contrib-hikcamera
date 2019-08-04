@@ -63,9 +63,21 @@ hikvisionApi.prototype.connect = function (options) {
 
 function handleData(self, data) {
 
-	parser.parseString(data, function (err, result) {
-		if (result !== undefined) {
+	let n = data.indexOf('<EventNotificationAlert');
+	if (n > -1) {
+		let parseData = data.slice(0, n);
+	} else {
+		let parseData = data;
+	}
+
+	parser.parseString(parseData, (err, result) => {
+		
+		if (err) console.log('parse err ' + err);
+
+		if (result !== undefined && result !== null) {
+
 			if (result['EventNotificationAlert'] !== undefined) {
+
 				var code = result['EventNotificationAlert']['eventType'][0];
 
 				/* we are only interested in Motion Detection or Line Crossing */
