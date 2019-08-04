@@ -64,28 +64,30 @@ hikvisionApi.prototype.connect = function (options) {
 function handleData(self, data) {
 
 	parser.parseString(data, function (err, result) {
-		if (result !== undefined && result['EventNotificationAlert'] !== undefined) {
-			var code = result['EventNotificationAlert']['eventType'][0];
+		if (result !== undefined) {
+			if (result['EventNotificationAlert'] !== undefined) {
+				var code = result['EventNotificationAlert']['eventType'][0];
 
-			/* we are only interested in Motion Detection or Line Crossing */
-			if (!((code === 'VMD') || (code === 'linedetection'))) {
-				return;
-			}
+				/* we are only interested in Motion Detection or Line Crossing */
+				if (!((code === 'VMD') || (code === 'linedetection'))) {
+					return;
+				}
 
-			var action = result['EventNotificationAlert']['eventState'][0];
-			var index = parseInt(result['EventNotificationAlert']['channelID'][0]);
-			var count = parseInt(result['EventNotificationAlert']['activePostCount'][0]);
+				var action = result['EventNotificationAlert']['eventState'][0];
+				var index = parseInt(result['EventNotificationAlert']['channelID'][0]);
+				var count = parseInt(result['EventNotificationAlert']['activePostCount'][0]);
 
-			if (code === 'VMD') code = 'VideoMotion';
-			if (code === 'linedetection') code = 'LineDetection';
-			if (action === 'active') action = 'Start';
-			if (action === 'inactive') action = 'Stop';
+				if (code === 'VMD') code = 'VideoMotion';
+				if (code === 'linedetection') code = 'LineDetection';
+				if (action === 'active') action = 'Start';
+				if (action === 'inactive') action = 'Stop';
 
-			if (action === 'Start' && count === 1) { /* a new event started */
-				self.emit('alarm', code, action, index);
-			}
-			if (action === 'Stop') { /* an event has stopped */
-				self.emit('alarm', code, action, index);
+				if (action === 'Start' && count === 1) { /* a new event started */
+					self.emit('alarm', code, action, index);
+				}
+				if (action === 'Stop') { /* an event has stopped */
+					self.emit('alarm', code, action, index);
+				}
 			}
 		}
 	});
