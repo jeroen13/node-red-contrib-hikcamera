@@ -64,7 +64,7 @@ hikvisionApi.prototype.connect = function (options) {
 function handleData(self, data) {
 
 	parser.parseString(data, function (err, result) {
-		if (result && result['EventNotificationAlert'] !== undefined) {
+		if (result !== undefined && result['EventNotificationAlert'] !== undefined) {
 			var code = result['EventNotificationAlert']['eventType'][0];
 
 			/* we are only interested in Motion Detection or Line Crossing */
@@ -89,6 +89,7 @@ function handleData(self, data) {
 			}
 		}
 	});
+
 }
 
 function handleConnection(self, options) {
