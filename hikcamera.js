@@ -1,9 +1,12 @@
 module.exports = function(RED) {
+
     "use strict";
+
     var HikvisionAPI = require('./hikvision-api').hikvisionApi;
     var http = require('http');
 
     function HikcameraCredentialsNode(config) {
+
         RED.nodes.createNode(this, config);
         var node = this;
 
@@ -16,9 +19,11 @@ module.exports = function(RED) {
         };
 
         this.options = options;
+
     }
 
     HikcameraCredentialsNode.prototype.connect = function(node) {
+
         var hikApi = null;
 
         node.status({
@@ -28,30 +33,23 @@ module.exports = function(RED) {
         });
 
         if (this.options != null) {
-            hikApi = new HikvisionAPI(this.options);
-            hikApi.on('error', function(err) {
-                node.error(err);
-                node.status({
-                    fill: "red",
-                    shape: "ring",
-                    text: "disconnected"
-                });
-            });
 
-            hikApi.on('connect', function(err) {
-                node.status({
-                    fill: "green",
-                    shape: "ring",
-                    text: "connected"
-                });
-            });
+            hikApi = new HikvisionAPI(this.options);
 
             hikApi.on('error', (err) => {
                 node.error(err);
                 node.status({
                     fill: "red",
                     shape: "ring",
-                    text: "connection error"
+                    text: "error"
+                });
+            });
+
+            hikApi.on('connect', (err) => {
+                node.status({
+                    fill: "green",
+                    shape: "ring",
+                    text: "connected"
                 });
             });
 
@@ -67,9 +65,11 @@ module.exports = function(RED) {
         }
 
         return hikApi;
+
     }
 
     RED.nodes.registerType("hikcamera-credentials", HikcameraCredentialsNode, {
+
         credentials: {
             host: {
                 type: "text"
@@ -84,9 +84,11 @@ module.exports = function(RED) {
                 type: "password"
             }
         }
+
     });
 
     function HikcameraAlarmInNode(config) {
+
         RED.nodes.createNode(this, config);
         var node = this;
 
@@ -95,8 +97,9 @@ module.exports = function(RED) {
         this.hikApi = this.hikcamera.connect(node);
 
         if (this.hikApi != null) {
-            // Monitor Camera Alarms
+
             this.hikApi.on('alarm', function(code, action, index) {
+
                 let data = {
                     'code': code,
                     'action': action,
@@ -107,25 +110,34 @@ module.exports = function(RED) {
                 node.send({
                     payload: data
                 });
+
             });
+
         } else {
+
             node.error("Invalid credentials");
+
             node.status({
                 fill: "red",
                 shape: "ring",
                 text: "conf invalid"
             });
+
         }
 
         this.on('close', function(done) {
+
             node.hikApi.client.destroy();
             done();
+
         });
+
     }
 
     RED.nodes.registerType("hikcamera-alarm-in", HikcameraAlarmInNode);
 
     function HikcameraImageInNode(config) {
+
         RED.nodes.createNode(this, config);
         var node = this;
 
