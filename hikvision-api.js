@@ -78,12 +78,13 @@ function handleData(self, data) {
 
 			if (code === 'VMD') code = 'VideoMotion';
 			if (code === 'linedetection') code = 'LineDetection';
-			if (action === 'active') action = 'Start'
-			if (action === 'inactive') action = 'Stop'
+			if (action === 'active') action = 'Start';
+			if (action === 'inactive') action = 'Stop';
 
 			if (action === 'Start' && count === 1) { /* a new event started */
 				self.emit('alarm', code, action, index);
-			} else if (action === 'Stop') { /* an event has stopped */
+			}
+			if (action === 'Stop') { /* an event has stopped */
 				self.emit('alarm', code, action, index);
 			}
 		}
