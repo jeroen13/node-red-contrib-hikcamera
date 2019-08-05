@@ -65,7 +65,7 @@ function handleData(self, data) {
 	
 	var parseData = '';
 
-	let n = data.indexOf('<EventNotificationAlert');
+	var n = data.indexOf('<EventNotificationAlert');
 	if (n > -1) {
 		parseData = data.slice(0, n);
 	} else {
