@@ -1,7 +1,6 @@
 var net = require('net');
 var events = require('events');
 var util = require('util');
-var request = require('request');
 var xml2js = require('xml2js');
 
 var TRACE = false;
@@ -22,7 +21,7 @@ util.inherits(hikvisionApi, events.EventEmitter);
 hikvisionApi.prototype.connect = function (options) {
 
 	var self = this;
-	var authHeader = 'Authorization: Basic ' + new Buffer(options.user + ':' + options.pass).toString('base64');
+	var authHeader = 'Authorization: Basic ' + new Buffer.from(options.user + ':' + options.pass).toString('base64');
 
 	var client = net.connect(options, function () {
 
@@ -67,9 +66,9 @@ function handleData(self, data) {
 
 	var n = data.indexOf('<EventNotificationAlert');
 	if (n > -1) {
-		parseData = data.slice(0, n);
+		parseData = data.toString().slice(n);
 	} else {
-		parseData = data;
+		return;
 	}
 
 	parser.parseString(parseData, (err, result) => {
