@@ -13,6 +13,7 @@ var hikvisionApi = function (options) {
 	this.client = this.connect(options)
 	if (options.log) TRACE = options.log;
 	BASEURI = 'http://' + options.host + ':' + options.port
+	this.detectedEvents = {};
 
 };
 
@@ -86,21 +87,31 @@ function handleData(self, data) {
 					return;
 				}
 
-				var action = result['EventNotificationAlert']['eventState'][0];
+				var state = result['EventNotificationAlert']['eventState'][0];
 				var index = parseInt(result['EventNotificationAlert']['channelID'][0]);
 				var count = parseInt(result['EventNotificationAlert']['activePostCount'][0]);
 
-				if (code === 'VMD') code = 'VideoMotion';
-				if (code === 'linedetection') code = 'LineDetection';
-				if (action === 'active') action = 'Start';
-				if (action === 'inactive') action = 'Stop';
+				var eventIndex = code+index;
+				var e = {code: code, state: state, index: index, count: count, lastSeen: Date.now() / 1000, send: false};
 
-				if (action === 'Start' && count === 1) { /* a new event started */
-					self.emit('alarm', code, action, index);
+				if (self.detectedEvents[eventIndex] !== undefined) { /* seen this one before */
+					if (self.detectedEvents[eventIndex].lastSeen < (e.lastSeen - 30)) { /* older than 30 seconds */
+						e.send = true;
+						self.detectedEvents[eventIndex] = e;
+					}
+				} else { /* this is a new one */
+					e.send = true;
+					self.detectedEvents[eventIndex] = e;
 				}
-				if (action === 'Stop') { /* an event has stopped */
-					self.emit('alarm', code, action, index);
+
+				if (e.state === 'inactive') { /* always send these */
+					self.emit('alarm', e.code, e.state, e.index);
+				} else if (e.state === 'active') {
+					if (e.send) {
+						self.emit('alarm', e.code, e.state, e.index);
+					}
 				}
+
 			}
 		}
 	});
