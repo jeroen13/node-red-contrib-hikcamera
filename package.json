@@ -22,7 +22,7 @@
     "author": "Dave Bowerman",
     "license": "MIT",
     "dependencies": {
-        "npm": "^5.7.1",
+        "npm": "^6.13.4",
         "xml2js": "^0.4.19"
     }
 }
