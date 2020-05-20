@@ -3,7 +3,7 @@ var events = require('events');
 var util = require('util');
 var xml2js = require('xml2js');
 
-var TRACE = false;
+var TRACE = true;
 var BASEURI = false;
 var parser = new xml2js.Parser();
 
@@ -80,36 +80,48 @@ function handleData(self, data) {
 
 			if (result['EventNotificationAlert'] !== undefined) {
 
-				var code = result['EventNotificationAlert']['eventType'][0];
+				var code = null;
 
-				/* we are only interested in Motion Detection or Line Crossing */
-				if (!((code === 'VMD') || (code === 'linedetection'))) {
-					return;
-				}
+				try {
+					code = result['EventNotificationAlert']['eventType'][0];
+				
 
-				var state = result['EventNotificationAlert']['eventState'][0];
-				var index = parseInt(result['EventNotificationAlert']['channelID'][0]);
-				var count = parseInt(result['EventNotificationAlert']['activePostCount'][0]);
+					/* we are only interested in Motion Detection or Line Crossing */
+					if (!((code === 'VMD') || (code === 'linedetection') || (code === 'videoloss'))) {
+						console.log("[HIKVISION API] CODE = " + code);
+						return;
+					}
 
-				var eventIndex = code+index;
-				var e = {code: code, state: state, index: index, count: count, lastSeen: Date.now() / 1000, send: false};
+					var state = result['EventNotificationAlert']['eventState'][0];
+					var index = parseInt(result['EventNotificationAlert']['channelID'][0]);
+					var count = parseInt(result['EventNotificationAlert']['activePostCount'][0]);
+					var ip = result['EventNotificationAlert']['ipAddress'][0];
 
-				if (self.detectedEvents[eventIndex] !== undefined) { /* seen this one before */
-					if (self.detectedEvents[eventIndex].lastSeen < (e.lastSeen - 30)) { /* older than 30 seconds */
+					var eventIndex = code+index;
+					var e = {ip: ip, code: code, state: state, index: index, count: count, lastSeen: Date.now() / 1000, send: false};
+
+					if (self.detectedEvents[eventIndex] !== undefined) { /* seen this one before */
+						if (self.detectedEvents[eventIndex].lastSeen < (e.lastSeen - 30)) { /* older than 30 seconds */
+							e.send = true;
+							self.detectedEvents[eventIndex] = e;
+						}
+					} else { /* this is a new one */
 						e.send = true;
 						self.detectedEvents[eventIndex] = e;
 					}
-				} else { /* this is a new one */
-					e.send = true;
-					self.detectedEvents[eventIndex] = e;
-				}
 
-				if (e.state === 'inactive') { /* always send these */
-					self.emit('alarm', e.code, e.state, e.index);
-				} else if (e.state === 'active') {
-					if (e.send) {
-						self.emit('alarm', e.code, e.state, e.index);
+					if (e.state === 'inactive') { /* always send these */
+						self.emit('alarm', e.ip, e.code, e.state, e.index);
+					} else if (e.state === 'active') {
+						if (e.send) {
+							self.emit('alarm', e.ip, e.code, e.state, e.index);
+						}
 					}
+
+				} catch (e) {
+					console.log("[HIKVISION API] INVALID XML RECEIVED: ");
+					console.log(e);
+					console.log(result);
 				}
 
 			}
