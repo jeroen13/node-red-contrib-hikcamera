@@ -169,7 +169,7 @@ module.exports = function(RED) {
                                 text: "communication error"
                             });
                         } else {
-                            msg.attachment = Buffer.concat(data);                         
+                            msg.payload = Buffer.concat(data);                         
                             
                             node.send(msg);
                             node.status({
