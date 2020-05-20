@@ -3,7 +3,7 @@ var events = require('events');
 var util = require('util');
 var xml2js = require('xml2js');
 
-var TRACE = true;
+var TRACE = false;
 var BASEURI = false;
 var parser = new xml2js.Parser();
 
