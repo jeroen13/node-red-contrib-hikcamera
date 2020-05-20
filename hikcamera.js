@@ -1,3 +1,5 @@
+//var fs = require("fs");
+
 module.exports = function(RED) {
 
     "use strict";
@@ -98,9 +100,10 @@ module.exports = function(RED) {
 
         if (this.hikApi != null) {
 
-            this.hikApi.on('alarm', function(code, action, index) {
+            this.hikApi.on('alarm', function(ip, code, action, index) {
 
                 let data = {
+                    'ip': ip,
                     'code': code,
                     'action': action,
                     'index': index,
@@ -168,7 +171,8 @@ module.exports = function(RED) {
                                 text: "communication error"
                             });
                         } else {
-                            msg.payload = Buffer.concat(data);
+                            msg.attachment = Buffer.concat(data);                         
+                            
                             node.send(msg);
                             node.status({
                                 fill: "green",
